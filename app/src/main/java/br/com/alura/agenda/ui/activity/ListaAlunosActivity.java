@@ -1,11 +1,8 @@
-package br.com.alura.agenda;
+package br.com.alura.agenda.ui.activity;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,20 +11,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import br.com.alura.agenda.R;
+import br.com.alura.agenda.dao.AlunoDAO;
 
-public class MainActivity extends AppCompatActivity {
+
+public class ListaAlunosActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_lista_alunos);
+
+        AlunoDAO dao = new AlunoDAO();
+
         setTitle("Lista de Alunos");
-        List<String> alunos = new ArrayList<>(Arrays.asList("Alexandre", "José", "Jurema", "Marcio", "Jurandir"));
-        ListView listaDeAlunos = findViewById(R.id.activity_main_lista_de_alunos);
+        ListView listaDeAlunos = findViewById(R.id.activity_lista_alunos_listview);
         listaDeAlunos.setAdapter(new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_1,
-                alunos));
-
+                dao.todos()));
     }
 }
