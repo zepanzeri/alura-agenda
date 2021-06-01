@@ -10,8 +10,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.List;
+
 import br.com.alura.agenda.R;
 import br.com.alura.agenda.dao.AlunoDAO;
+import br.com.alura.agenda.model.Aluno;
 
 
 public class ListaAlunosActivity extends AppCompatActivity {
@@ -24,7 +27,6 @@ public class ListaAlunosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_alunos);
         setTitle(LISTA_DE_ALUNOS);
-
         configuraFabNovoAluno();
     }
 
@@ -45,9 +47,18 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
     private void configuraLista() {
         ListView listaDeAlunos = findViewById(R.id.activity_lista_alunos_listview);
+        final List<Aluno> alunos = dao.todos();
         listaDeAlunos.setAdapter(new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_1,
-                dao.todos()));
+                alunos));
+        listaDeAlunos.setOnItemClickListener((parent, view, position, id) -> {
+            Aluno alunoEscolhido = alunos.get(position);
+            Intent vaiParaFormularioAlunoActivity = new Intent(
+                    ListaAlunosActivity.this,
+                    FormularioAlunoActivity.class);
+            vaiParaFormularioAlunoActivity.putExtra("aluno",alunoEscolhido);
+            startActivity(vaiParaFormularioAlunoActivity);
+        });
     }
 }

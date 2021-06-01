@@ -1,5 +1,6 @@
 package br.com.alura.agenda.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,30 +14,47 @@ import br.com.alura.agenda.model.Aluno;
 
 public class FormularioAlunoActivity extends AppCompatActivity {
 
-    public static final String NOVO_ALUNO = "Novo aluno";
+    public static final String TITULO_APPBAR = "Novo aluno";
     private EditText campoNome;
     private EditText campoTelefone;
     private EditText campoEmail;
     private Button botaoSalvar;
     private final AlunoDAO dao = new AlunoDAO();
+    private Aluno aluno;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_formulario_aluno);
-
-        setTitle(NOVO_ALUNO);
-
+        setTitle(TITULO_APPBAR);
         inicializaCampos();
-
         configuraBotaoSalvar();
+        Intent dados = getIntent();
+
+        if (dados.hasExtra("aluno")) {
+            aluno = (Aluno) dados.getSerializableExtra("aluno");
+            campoNome.setText(aluno.getNome());
+            campoTelefone.setText(aluno.getTelefone());
+            campoEmail.setText(aluno.getEmail());
+        } else {
+            aluno = new Aluno();
+        }
+
     }
 
     private void configuraBotaoSalvar() {
-        botaoSalvar.setOnClickListener((view)->{
-            Aluno alunoCriado = criaAluno();
-            mostraMensagem();
-            salvaAluno(alunoCriado);
+        botaoSalvar.setOnClickListener((view) -> {
+//            Aluno alunoCriado = preencheAluno();
+//            salvaAluno(alunoCriado);
+            preencheAluno();
+            if (aluno.temIdValid()) {
+                dao.edita(aluno);
+                mostraMensagem("Aluno editado com sucesso");
+            } else {
+                dao.salva(aluno);
+                mostraMensagem("Aluno cadastrado com sucesso");
+            }
+            finish();
         });
     }
 
@@ -47,22 +65,19 @@ public class FormularioAlunoActivity extends AppCompatActivity {
         botaoSalvar = findViewById(R.id.activity_formulario_alunos_botao_salvar);
     }
 
-    private void mostraMensagem() {
+    private void mostraMensagem(String mensagem) {
         Toast.makeText(FormularioAlunoActivity.this,
-                "Aluno criado com sucesso!",
-                Toast.LENGTH_SHORT).show();
+                mensagem,
+                Toast.LENGTH_LONG).show();
     }
 
-    private void salvaAluno(Aluno aluno) {
-        dao.salva(aluno);
-        finish();
-    }
 
-    private Aluno criaAluno() {
+    private void preencheAluno() {
         String nome = campoNome.getText().toString();
         String telefone = campoTelefone.getText().toString();
         String email = campoEmail.getText().toString();
-        Aluno alunoCriado = new Aluno(nome, telefone, email);
-        return alunoCriado;
+        aluno.setNome(nome);
+        aluno.setTelefone(telefone);
+        aluno.setEmail(email);
     }
 }
