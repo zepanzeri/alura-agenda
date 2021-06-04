@@ -2,10 +2,13 @@ package br.com.alura.agenda.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import br.com.alura.agenda.R;
@@ -21,7 +24,6 @@ public class FormularioAlunoActivity extends AppCompatActivity {
     private EditText campoNome;
     private EditText campoTelefone;
     private EditText campoEmail;
-    private Button botaoSalvar;
     private final AlunoDAO dao = new AlunoDAO();
     private Aluno aluno;
 
@@ -30,8 +32,22 @@ public class FormularioAlunoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_formulario_aluno);
         inicializaCampos();
-        configuraBotaoSalvar();
         carregaAluno();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_formulario_aluno_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.activity_formulario_aluno_menu_salvar) {
+            finalizaFormulario();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void carregaAluno() {
@@ -52,29 +68,22 @@ public class FormularioAlunoActivity extends AppCompatActivity {
         campoEmail.setText(aluno.getEmail());
     }
 
-    private void configuraBotaoSalvar() {
-        finalizaFormulario();
-    }
-
     private void finalizaFormulario() {
-        botaoSalvar.setOnClickListener((view) -> {
-            preencheAluno();
-            if (aluno.temIdValid()) {
-                dao.edita(aluno);
-                mostraMensagem("Aluno editado com sucesso");
-            } else {
-                dao.salva(aluno);
-                mostraMensagem("Aluno inserido com sucesso");
-            }
-            finish();
-        });
+        preencheAluno();
+        if (aluno.temIdValido()) {
+            dao.edita(aluno);
+            mostraMensagem("Aluno editado com sucesso");
+        } else {
+            dao.salva(aluno);
+            mostraMensagem("Aluno inserido com sucesso");
+        }
+        finish();
     }
 
     private void inicializaCampos() {
         campoNome = findViewById(R.id.activity_formulario_alunos_nome);
         campoTelefone = findViewById(R.id.activity_formulario_alunos_telefone);
         campoEmail = findViewById(R.id.activity_formulario_alunos_email);
-        botaoSalvar = findViewById(R.id.activity_formulario_alunos_botao_salvar);
     }
 
     private void mostraMensagem(String mensagem) {
